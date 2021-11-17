@@ -13,7 +13,7 @@ stm32cubeide
 
 hal, hardware i2c 400k
 
-using array screen buf,  so you can easily transplant the code to other platform.
+using array screen buf,  all screen redraw can reach 80 fps, you can easily transplant the code to other platform.
 
 ![1](./1.PNG)
 
@@ -22,7 +22,7 @@ using array screen buf,  so you can easily transplant the code to other platform
 
 
 https://youtu.be/DO_1YEvYrUI
-[![Watch the video](https://youtu.be/DO_1YEvYrUI)](https://youtu.be/DO_1YEvYrUI)
+[![Watch the video](https://img.youtube.com/vi/DO_1YEvYrUI/0.jpg)](https://youtu.be/DO_1YEvYrUI)
 
 core source code
 
