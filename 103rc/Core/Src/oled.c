@@ -1,32 +1,9 @@
-# stm32-hal-0.91oled-iic-ssd1306-demo
-stm32-hal-0.91oled-iic-ssd1306-demo
-
-### hardware
-
-stm32f103rct6 
-
-0.91# oled 128x32 , iic, ssd1306
-
-### software
-
-stm32cubeide 
-
-hal, hardware i2c 400k
-
-using array screen buf,  so you can easily transplant the code to other platform.
-
-![1](./1.PNG)
-
-![2](./2.png)
-
-
-
-https://youtu.be/DO_1YEvYrUI
-[![Watch the video](https://youtu.be/DO_1YEvYrUI)](https://youtu.be/DO_1YEvYrUI)
-
-core source code
-
-```c
+/*
+ * oled.c
+ *
+ *  Created on: Nov 17, 2021
+ *      Author: wvv
+ */
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -173,5 +150,4 @@ void oled_demo_run()
 		oled_refresh();
 	}
 }
-```
 
