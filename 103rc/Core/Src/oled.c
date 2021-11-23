@@ -102,6 +102,14 @@ void oled_input_ch(char ch)
 		loc_y = HEIGHT - 1;
 	}
 }
+void oled_input(char *ch)
+{
+	while(*ch)
+	{
+		oled_input_ch(*ch);
+		ch++;
+	}
+}
 void oled_refresh(void)
 {
 	for (uint8_t i = 0; i < HEIGHT; i++)
@@ -162,13 +170,32 @@ void oled_init(void)
 	oled_clear();
 	oled_refresh();
 }
-
+extern UART_HandleTypeDef huart2;
+uint8_t rxbuf[100];
+void uart_int()
+{
+	if (__HAL_UART_GET_FLAG(&huart2, UART_FLAG_IDLE) != RESET)
+	{
+		__HAL_UART_CLEAR_IDLEFLAG(&huart2);
+		HAL_UART_DMAStop(&huart2);
+		uint8_t len = 100 - __HAL_DMA_GET_COUNTER(huart2.hdmarx);
+		for(uint8_t i =0;i<len;i++)
+		{
+			oled_input_ch(rxbuf[i]);
+		}
+		HAL_UART_Receive_DMA(&huart2, rxbuf, 100);
+	}
+}
 void oled_demo_run()
 {
 	oled_init();
+	__HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
+	HAL_UART_Receive_DMA(&huart2, rxbuf, 100);
+	oled_input("CONSOLE demo v0.1\n");
+	oled_input("you can type through uart2.");
 	while (1)
 	{
-		oled_input_ch(rand() % 96 + ' ');
+		//oled_input_ch(rand() % 96 + ' ');
 		/* USER CODE END WHILE */
 		oled_refresh();
 		HAL_Delay(50);
