@@ -16,9 +16,12 @@ void oled_write_cmd(uint8_t cmd)
 }
 #define WIDTH 128
 #define HEIGHT 4
+#define LINE_MAX_CHARS 21
 #define PIXEL_MODE_PAINT 	0
 #define PIXEL_MODE_CLEAR	1
-uint8_t _buf[HEIGHT * WIDTH] = { 0 };
+uint8_t _buf[HEIGHT * WIDTH] =
+{ 0 };
+uint8_t loc_x, loc_y;
 void oled_clear(void)
 {
 	memset(_buf, 0x00, sizeof(_buf));
@@ -52,7 +55,7 @@ void oled_putchar(char c, uint8_t x, uint8_t y)
 		p++;
 	}
 }
-void oled_str(char* str, uint8_t x, uint8_t y)
+void oled_str(char *str, uint8_t x, uint8_t y)
 {
 	int offset = 0;
 	while (*str)
@@ -60,6 +63,43 @@ void oled_str(char* str, uint8_t x, uint8_t y)
 		oled_putchar(*str, x + offset, y);
 		offset += 6;
 		str++;
+	}
+}
+void oled_line_shift()
+{
+	for (int i = 0; i < HEIGHT - 1; i++)
+	{
+		memcpy(&_buf[i * WIDTH], &_buf[(i + 1) * WIDTH], WIDTH);
+	}
+	memset(&_buf[(HEIGHT - 1) * WIDTH], 0, WIDTH);
+}
+void oled_input_ch(char ch)
+{
+	if (ch >= ' ' && ch <= '~')
+	{
+		oled_putchar(ch, loc_x * 6, loc_y);
+		loc_x++;
+	}
+	else if (ch == '\n')
+	{
+		loc_x = 0;
+		loc_y++;
+	}
+	else
+	{
+		oled_putchar(127, loc_x * 6, loc_y);
+		loc_x++;
+	}
+	ch++;
+	if (loc_x >= LINE_MAX_CHARS)
+	{
+		loc_y++;
+		loc_x = 0;
+	}
+	if (loc_y >= HEIGHT)
+	{
+		oled_line_shift();
+		loc_y = HEIGHT - 1;
 	}
 }
 void oled_refresh(void)
@@ -126,28 +166,12 @@ void oled_init(void)
 void oled_demo_run()
 {
 	oled_init();
-	oled_str("OLED DEMO FPS:",0,0);
-	uint32_t last = 0, show = 0;
-	char buf[10];
-	while(1)
+	while (1)
 	{
-		if(HAL_GetTick()-show >500) //fps
-		{
-			int det = HAL_GetTick()-last;
-			if(det > 0)
-			{
-				sprintf(buf,"%d",1000/det);
-			}
-			oled_str(buf,14*6,0);
-			show = HAL_GetTick();
-		}
-		last = HAL_GetTick();
-		for(int i=0;i<10;i++)
-		{
-			oled_putchar(rand()%96+' ', rand()%21*6, rand()%3+1);
-		}
+		oled_input_ch(rand() % 96 + ' ');
 		/* USER CODE END WHILE */
 		oled_refresh();
+		HAL_Delay(50);
 	}
 }
 
